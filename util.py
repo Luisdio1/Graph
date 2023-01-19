@@ -3,22 +3,23 @@ import matplotlib.pyplot as plt
 import math
 
 def draw_graph(G):
+    # Split the positive and negative edges
     elarge = [(u, v) for (u, v, d) in G.edges(data=True) if d["weight"] > 0.5]
     esmall = [(u, v) for (u, v, d) in G.edges(data=True) if d["weight"] <= 0.5]
 
-    # nodes
+    # Nodes
     pos = nx.spectral_layout(G)
     nx.draw_networkx_nodes(G, pos, node_size=700)
 
-    # edges
+    # Edges
     nx.draw_networkx_edges(G, pos, edgelist=elarge, width=6)
     nx.draw_networkx_edges(
         G, pos, edgelist=esmall, width=6, alpha=0.5, edge_color="b", style="dashed"
     )
 
-    # node labels
+    # Node labels
     nx.draw_networkx_labels(G, pos, font_size=20, font_family="sans-serif")
-    # edge weight labels
+    # Edge weight labels
     edge_labels = nx.get_edge_attributes(G, "weight")
     nx.draw_networkx_edge_labels(G, pos, edge_labels)
 
@@ -31,7 +32,9 @@ def draw_graph(G):
 def positive_connected_components(G):
     # Create a copy of the graph and remove all negative edges
     G_positive = G.copy()
+    # For all edges
     for u, v, w in list(G.edges(data=True)):
+        # If the weight is negative remove the edge from the copy
         if w['weight'] < 0:
             G_positive.remove_edge(u, v)
 
@@ -41,12 +44,18 @@ def positive_connected_components(G):
     return connected_components
 
 def find_negative_edge_circle(G, connected_components):
+    # For every component
     for component in connected_components:
+        # Find the cycles and iterate over them
         subgraph = G.subgraph(component)
         for cycle in nx.cycle_basis(subgraph):
+            neg_edges = 0
+            # If we have a negative edge in the cycle return it, otherwise return None
             for u, v in zip(cycle, cycle[1:]):
                 if G[u][v]['weight'] < 0:
-                    return cycle
+                    neg_edges += 1
+            if neg_edges == 1:
+                return cycle
     return None
 
 def create_new_graph(G, connected_components):

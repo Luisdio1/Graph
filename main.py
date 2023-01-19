@@ -8,6 +8,9 @@ import matplotlib.pyplot as plt
 import math
 import warnings
 import util
+import urllib.request
+import os
+import tarfile
 
 warnings.filterwarnings('ignore')
 
@@ -32,18 +35,13 @@ if __name__ == '__main__':
     util.check_balance(G)
     ##########################################################################
     # Third graph example from eclass
-
     G = nx.Graph()
-
     G.add_edge(0, 1, weight=1)
     G.add_edge(0, 2, weight=1)
-
     G.add_edge(1, 2, weight=1)
     G.add_edge(1, 4, weight=1)
     G.add_edge(1, 3, weight=-1)
-
     G.add_edge(2, 5, weight=-1)
-
     G.add_edge(3, 7, weight=-1)
     G.add_edge(3, 8, weight=-1)
 
@@ -74,8 +72,16 @@ if __name__ == '__main__':
     ###################################################################################
 
     # Tribes Graph
+    filename = 'ucidata-gama.tar.bz2'
+    url = "http://konect.cc/files/download.tsv.{}".format(filename)
+    if not os.path.exists(filename):
+        urllib.request.urlretrieve(url, filename)
+
+    tar = tarfile.open(filename, "r:bz2")
+    tar.extractall()
+    tar.close()
     # Load the graph using NetworkX's `read_edgelist` function
-    G = nx.read_edgelist('out.ucidata-gama', comments='%', nodetype=int, data=[('sign', int)])
+    G = nx.read_edgelist('ucidata-gama/out.ucidata-gama', comments='%', nodetype=int, data=[('sign', int)])
 
     # You can then access the nodes and edges of the graph using the `nodes` and `edges` methods
     nodes = G.nodes()
@@ -90,8 +96,16 @@ if __name__ == '__main__':
 
     ####################################################################################
     # Wiki conflict Graph
+    filename = 'wikiconflict.tar.bz2'
+    url = "http://konect.cc/files/download.tsv.{}".format(filename)
+    if not os.path.exists(filename):
+        urllib.request.urlretrieve(url, filename)
+
+    tar = tarfile.open(filename, "r:bz2")
+    tar.extractall()
+    tar.close()
     # Load the graph using NetworkX's `read_edgelist` function
-    G = nx.read_edgelist('out.wikiconflict', comments='%', nodetype=int, data=[('sign', float), ('unknown', int)])
+    G = nx.read_edgelist('wikiconflict/out.wikiconflict', comments='%', nodetype=int, data=[('sign', float), ('unknown', int)])
 
     # You can then access the nodes and edges of the graph using the `nodes` and `edges` methods
     nodes = G.nodes()
